@@ -1,5 +1,5 @@
 <template>
-  <div id="container" :ref="refName">
+  <div id="container" ref="container">
     <template v-if="ready">
       <slot></slot>
     </template>
@@ -15,28 +15,44 @@ export default {
   props: {
     options: {
       type: Object,
-      default: () => ({})
+      default: () => ({
+        width: 3840,
+        height: 2160
+      })
     }
   },
   setup(ctx) {
-    const refName = 'container'
+    let context, dom, domObserver
+    const ready = ref(false) // 宽高设置完毕再渲染内容
     const width = ref(0)
     const height = ref(0)
     const originalWidth = ref(0)
     const originalHeight = ref(0)
-    let context, dom
-    const ready = ref(false)
+
+    onMounted(async () => {
+      context = getCurrentInstance().ctx
+      dom = context.$refs['container']
+      await initSize()
+      initConfig()
+      setScale()
+      bindDomResizeCallback(onResize)
+      ready.value = true
+    })
+
+    onUnmounted(() => {
+      unbindDomResizeCallback()
+    })
 
     const initSize = () => {
-      return new Promise((resolve => {
+      return new Promise(resolve => {
         nextTick(() => {
-          // 容器的真实尺寸（大屏的大小）
+          // 容器的期望尺寸（大屏的大小）
           if (ctx.options && ctx.options.height && ctx.options.width) {
-            height.value = ctx.options.height
             width.value = ctx.options.width
+            height.value = ctx.options.height
           } else {
-            height.value = dom.clientHeight
             width.value = dom.clientWidth
+            height.value = dom.clientHeight
           }
           // 当前视口的尺寸
           if (!originalWidth.value || !originalHeight.value) {
@@ -45,10 +61,10 @@ export default {
           }
           resolve()
         })
-      }))
+      })
     }
 
-    const updateSize = () => {
+    const initConfig = () => {
       // 优先设置为用户传入宽高，然后才是当前视口的宽高
       if (width.value && height.value) {
         dom.style.width = `${width.value}px`
@@ -59,41 +75,37 @@ export default {
       }
     }
 
-    const updateScale = () => {
-      // 真实的视口尺寸
+    const setScale = () => {
+      // 当前的内容尺寸
       const currentWidth = document.body.clientWidth
       const currentHeight = document.body.clientHeight
-      // 容器最终的宽高
+      // 期望的内容尺寸
       const realWidth = width.value || originalWidth.value
       const realHeight = height.value || originalHeight.value
-      const widthScale = currentWidth / realWidth
-      const heightScale = currentHeight / realHeight
-      dom.style.transform = `scale(${widthScale}, ${heightScale})`
+      // 设置缩放比
+      dom.style.transform = `scale(${currentWidth / realWidth}, ${currentHeight / realHeight})`
     }
 
     const onResize = async () => {
       await initSize()
-      updateScale()
+      setScale()
     }
 
-    onMounted(async () => {
-      ready.value = false
-      context = getCurrentInstance().ctx
-      dom = context.$refs[refName]
-      await initSize()
-      updateSize()
-      updateScale()
-      // debounce是为了防止连续触发
-      window.addEventListener('resize', debounce(500, onResize))
-      ready.value = true
-    })
+    const bindDomResizeCallback = (callback) => {
+      const MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver
+      domObserver = new MutationObserver(callback)
+      domObserver.observe(dom, {attributes: true, attributeFilter: ['style'], attributeOldValue: true})
+      window.addEventListener('resize', debounce(500, callback)) // debounce是为了防止连续触发
+    }
 
-    onUnmounted(() => {
+    const unbindDomResizeCallback = () => {
+      domObserver.disconnect()
+      domObserver.takeRecords()
+      domObserver = null
       window.removeEventListener('resize', debounce(500, onResize))
-    })
+    }
 
     return {
-      refName,
       ready
     }
   }
@@ -108,6 +120,5 @@ export default {
   overflow: hidden;
   z-index: 999;
   transform-origin: left top;
-  background: yellow;
 }
 </style>
