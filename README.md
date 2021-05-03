@@ -1,10 +1,16 @@
 # 数据可视化 - 图表组件库
 
-> 本项目为数据可视化之图表组件库，具体详见：[课程官网](http://www.youbaobao.xyz/datav-docs/) + [个人笔记](https://github.com/MrEnvision/data-vision-libs)。
+> 本项目为数据可视化之图表组件库，主要用于配合[数据可视化 - 外卖业务数据大屏](https://github.com/MrEnvision/data-vision-screen)使用，具体详见：[课程官网](http://www.youbaobao.xyz/datav-docs/) + [个人笔记](https://github.com/MrEnvision/data-vision-libs)。
 >
 > TIP：更多内容详见[数据可视化专题](https://github.com/MrEnvision/data-vision)！！！
 
+## 0. 组件介绍
 
+- [IconUsing](./src/components/IconUsing/IconUsing.vue) - Icon使用组件
+- [IconLoading](./src/components/IconLoading/IconLoading.vue) - 加载Icon组件
+- [Container](./src/components/Container/Container.vue) - 自适应宽高容器组件
+- [FlyBox](./src/components/FlyBox/FlyBox.vue) - 飞线盒子组件
+- [CountTo](./src/components/CountTo/CountTo.vue) - 数字滚动组件（来自[vue-count-to](https://www.npmjs.com/package/vue-count-to)）
 
 ## 1. rollup配置
 
@@ -62,3 +68,4 @@ $ npm unlink
 ------
 
 如果发现本项目有错误，欢迎提交 issues 指正，也可联系邮箱[EnvisionShen@gmail.com](mailto:EnvisionShen@gmail.com)。
+

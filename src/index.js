@@ -3,10 +3,12 @@ import IconUsing from './components/IconUsing/index'
 import IconLoading from "./components/IconLoading/index";
 import FlyBox from "./components/FlyBox/index";
 import Container from "./components/Container/index";
+import CountTo from "./components/CountTo/index";
 
 export default function (Vue) {
   Vue.use(IconUsing)
   Vue.use(IconLoading)
   Vue.use(FlyBox)
   Vue.use(Container)
+  Vue.use(CountTo)
 }
