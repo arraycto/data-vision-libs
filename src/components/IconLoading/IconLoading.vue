@@ -53,7 +53,7 @@
       </circle>
     </svg>
     <div class="loading-content">
-     <slot />
+      <slot/>
     </div>
   </div>
 </template>
@@ -86,4 +86,13 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.icon-loading-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+</style>
